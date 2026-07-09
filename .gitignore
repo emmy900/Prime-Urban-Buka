@@ -1,0 +1,5 @@
+.agents/
+.claude/
+.gemini/
+*.log
+node_modules/
