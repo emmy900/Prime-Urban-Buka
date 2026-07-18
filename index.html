@@ -522,6 +522,8 @@
         <p class="form-note">
           Your submission triggers an immediate email with our Q3 Technical Data Sheets and pricing.
         </p>
+
+        <div id="formError" class="form-error" role="alert" aria-live="polite"></div>
       </div>
     </div>
   </section>
@@ -644,21 +646,36 @@
     });
 
     // ===== Contact form =====
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
+    const contactForm = document.getElementById('contactForm');
+    const formError = document.getElementById('formError');
+
+    contactForm.addEventListener('submit', async function(e) {
       e.preventDefault();
+      formError.textContent = '';
+
       const formData = new FormData(this);
-      const name = formData.get('nameCompany');
-      const email = formData.get('email');
-      const commodity = formData.get('commodity');
+      const payload = {
+        name: formData.get('nameCompany'),
+        email: formData.get('email'),
+        commodity: formData.get('commodity')
+      };
 
-      // Simulated Resend API response
-      alert(
-        `Thank you, ${name}!\n\n` +
-        `Your Q3 Technical Data Sheets for "${commodity}" will be emailed to ${email} shortly.\n\n` +
-        `This is a simulated submission for demonstration purposes.`
-      );
+      try {
+        const res = await fetch('/api/submit-lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-      this.reset();
+        if (res.ok) {
+          showSuccessModal(payload.name, payload.commodity); // custom branded modal
+          this.reset();
+        } else {
+          formError.textContent = 'Something went wrong — please try again.';
+        }
+      } catch (err) {
+        formError.textContent = 'Network error — please try again.';
+      }
     });
 
     // ===== Mobile toggle =====
