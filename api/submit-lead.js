@@ -3,9 +3,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, email, commodity } = req.body;
+  const { name, email, commodity, message } = req.body;
 
-  if (!name || !email || !commodity) {
+  if (!name || !email || !commodity || !message) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
@@ -15,11 +15,10 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ name, email, commodity })
+      body: JSON.stringify({ name, email, commodity, message })
     });
 
     if (!supabaseRes.ok) throw new Error('Failed to save lead');
